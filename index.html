@@ -656,7 +656,8 @@
                 id: id,
                 name: '',
                 numTAsRequired: '',
-                selectedTAs: []
+                selectedTAs: [],
+                additionalInfo: ''
             });
 
             const container = document.getElementById(category + 'Container');
@@ -705,6 +706,13 @@
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <label>Additional Information (Optional)</label>
+                        <textarea id="${category}-info-${id}" 
+                                  placeholder="Any additional notes or requirements..." 
+                                  onchange="updateAdditionalInfo('${category}', ${id}, this.value)"
+                                  style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; resize: vertical; min-height: 60px; font-family: inherit;"></textarea>
+                    </div>
                 </div>
                 <button class="btn-danger" onclick="removeItem('${category}', ${id})">Remove</button>
             `;
@@ -739,6 +747,13 @@
             const item = formData[category].find(item => item.id === id);
             if (item) {
                 item.numTAsRequired = value;
+            }
+        }
+
+        function updateAdditionalInfo(category, id, value) {
+            const item = formData[category].find(item => item.id === id);
+            if (item) {
+                item.additionalInfo = value;
             }
         }
 
@@ -842,6 +857,7 @@
                             <p class="name">${course.name}</p>
                             <p>Number of TAs: ${course.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None selected'}</p>
+                            ${course.additionalInfo ? `<p>Additional Information: ${course.additionalInfo}</p>` : ''}
                         </div>
                     `;
                 });
@@ -857,6 +873,7 @@
                             <p class="name">${lab.name}</p>
                             <p>Number of TAs: ${lab.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None selected'}</p>
+                            ${lab.additionalInfo ? `<p>Additional Information: ${lab.additionalInfo}</p>` : ''}
                         </div>
                     `;
                 });
@@ -872,6 +889,7 @@
                             <p class="name">${facility.name}</p>
                             <p>Number of TAs: ${facility.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None selected'}</p>
+                            ${facility.additionalInfo ? `<p>Additional Information: ${facility.additionalInfo}</p>` : ''}
                         </div>
                     `;
                 });
@@ -923,7 +941,8 @@
                                 submitterEmail: email,
                                 courseName: course.name,
                                 numTAsRequired: course.numTAsRequired || 'Not specified',
-                                selectedTAs: course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None specified'
+                                selectedTAs: course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None specified',
+                                additionalInfo: course.additionalInfo || ''
                             }
                         })
                     }).catch(err => console.error('Course submission error:', err));
@@ -943,7 +962,8 @@
                                 submitterEmail: email,
                                 labName: lab.name,
                                 numTAsRequired: lab.numTAsRequired || 'Not specified',
-                                selectedTAs: lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None specified'
+                                selectedTAs: lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None specified',
+                                additionalInfo: lab.additionalInfo || ''
                             }
                         })
                     }).catch(err => console.error('Lab submission error:', err));
@@ -963,7 +983,8 @@
                                 submitterEmail: email,
                                 facilityName: facility.name,
                                 numTAsRequired: facility.numTAsRequired || 'Not specified',
-                                selectedTAs: facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None specified'
+                                selectedTAs: facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None specified',
+                                additionalInfo: facility.additionalInfo || ''
                             }
                         })
                     }).catch(err => console.error('Facility submission error:', err));
@@ -1039,4 +1060,5 @@
         window.onload = init;
     </script>
 </body>
+
 </html>
