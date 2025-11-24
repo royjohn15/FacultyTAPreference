@@ -710,7 +710,7 @@
                         <label>Additional Information (Optional)</label>
                         <textarea id="${category}-info-${id}" 
                                   placeholder="Any additional notes or requirements..." 
-                                  onchange="updateAdditionalInfo('${category}', ${id}, this.value)"
+                                  oninput="updateAdditionalInfo('${category}', ${id}, this.value)"
                                   style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; resize: vertical; min-height: 60px; font-family: inherit;"></textarea>
                     </div>
                 </div>
@@ -852,12 +852,14 @@
             if (courses.length > 0) {
                 html += '<div class="confirmation-item"><h4>Courses</h4>';
                 courses.forEach(course => {
+                    const additionalInfoDisplay = course.additionalInfo ? 
+                        course.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
                     html += `
                         <div class="confirmation-detail">
                             <p class="name">${course.name}</p>
                             <p>Number of TAs: ${course.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${course.additionalInfo ? `<p>Additional Information: ${course.additionalInfo}</p>` : ''}
+                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
                         </div>
                     `;
                 });
@@ -868,12 +870,14 @@
             if (labs.length > 0) {
                 html += '<div class="confirmation-item"><h4>Labs</h4>';
                 labs.forEach(lab => {
+                    const additionalInfoDisplay = lab.additionalInfo ? 
+                        lab.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
                     html += `
                         <div class="confirmation-detail lab">
                             <p class="name">${lab.name}</p>
                             <p>Number of TAs: ${lab.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${lab.additionalInfo ? `<p>Additional Information: ${lab.additionalInfo}</p>` : ''}
+                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
                         </div>
                     `;
                 });
@@ -884,12 +888,14 @@
             if (facilities.length > 0) {
                 html += '<div class="confirmation-item"><h4>Facilities</h4>';
                 facilities.forEach(facility => {
+                    const additionalInfoDisplay = facility.additionalInfo ? 
+                        facility.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
                     html += `
                         <div class="confirmation-detail facility">
                             <p class="name">${facility.name}</p>
                             <p>Number of TAs: ${facility.numTAsRequired || 'Not specified'}</p>
                             <p>Specific TAs: ${facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${facility.additionalInfo ? `<p>Additional Information: ${facility.additionalInfo}</p>` : ''}
+                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
                         </div>
                     `;
                 });
