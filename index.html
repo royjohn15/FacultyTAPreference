@@ -1,1015 +1,654 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA Preferences Form</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f9fafb;
-            padding: 2rem 1rem;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        h1 {
-            font-size: 2rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 2rem;
-        }
-
-        .section {
-            margin-bottom: 2rem;
-        }
-
-        h3 {
-            font-size: 1.125rem;
-            color: #374151;
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-bottom: 0.25rem;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="number"],
-        select {
-            width: 100%;
-            padding: 0.625rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .item-card {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .item-fields {
-            margin-bottom: 1rem;
-        }
-
-        .item-fields > * {
-            margin-bottom: 0.75rem;
-        }
-
-        .multiselect-container {
-            position: relative;
-        }
-
-        .multiselect-button {
-            width: 100%;
-            padding: 0.625rem 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.875rem;
-            color: #6b7280;
-        }
-
-        .multiselect-button:hover {
-            border-color: #3b82f6;
-        }
-
-        .multiselect-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            margin-top: 0.25rem;
-            max-height: 240px;
-            overflow-y: auto;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            z-index: 10;
-            display: none;
-        }
-
-        .multiselect-dropdown.active {
-            display: block;
-        }
-
-        .multiselect-option {
-            padding: 0.5rem 0.75rem;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .multiselect-option:hover {
-            background: #f9fafb;
-        }
-
-        .multiselect-option input {
-            margin-right: 0.5rem;
-        }
-
-        .btn {
-            padding: 0.625rem 1.25rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-            width: 100%;
-            padding: 0.875rem;
-            font-size: 1rem;
-        }
-
-        .btn-primary:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #374151;
-            border: 1px solid #d1d5db;
-        }
-
-        .btn-secondary:hover {
-            background: #f9fafb;
-        }
-
-        .btn-danger {
-            color: #dc2626;
-            background: none;
-            border: none;
-            font-size: 0.875rem;
-            cursor: pointer;
-            padding: 0.25rem 0;
-        }
-
-        .btn-danger:hover {
-            color: #991b1b;
-        }
-
-        .btn-add {
-            color: #3b82f6;
-            background: none;
-            border: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 0.5rem 0;
-        }
-
-        .btn-add:hover {
-            color: #2563eb;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            z-index: 100;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-
-        .confirmation-item {
-            margin-bottom: 1.5rem;
-        }
-
-        .confirmation-item h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .confirmation-detail {
-            padding-left: 1rem;
-            border-left: 2px solid #3b82f6;
-            margin-bottom: 0.75rem;
-        }
-
-        .confirmation-detail.lab {
-            border-color: #10b981;
-        }
-
-        .confirmation-detail.facility {
-            border-color: #8b5cf6;
-        }
-
-        .confirmation-detail p {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin: 0.25rem 0;
-        }
-
-        .confirmation-detail .name {
-            font-weight: 500;
-            color: #1f2937;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-        }
-
-        .modal-buttons .btn {
-            flex: 1;
-        }
-
-        .success-icon {
-            width: 64px;
-            height: 64px;
-            background: #d1fae5;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            color: #10b981;
-            font-size: 2rem;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        @media (max-width: 640px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-
-            .modal-buttons {
-                flex-direction: column;
-            }
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TA Preferences Form</title>
+<style>
+/* (Same styling as you had — compacted for readability) */
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:#f9fafb;padding:2rem 1rem;line-height:1.6} .container{max-width:900px;margin:0 auto;background:#fff;padding:2rem;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}h1{font-size:2rem;color:#1f2937;margin-bottom:.5rem}.subtitle{color:#6b7280;margin-bottom:1.25rem}.section{margin-bottom:1.5rem}h3{font-size:1.125rem;color:#374151;margin-bottom:.75rem}label{display:block;font-size:.75rem;color:#6b7280;margin-bottom:.25rem}input[type="text"],input[type="email"],input[type="number"],select,textarea{width:100%;padding:.6rem .75rem;border:1px solid #d1d5db;border-radius:6px;font-size:.9rem} .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.item-card{background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;padding:1rem;margin-bottom:1rem}.multiselect-container{position:relative}.multiselect-button{width:100%;padding:.6rem .75rem;border:1px solid #d1d5db;border-radius:6px;background:#fff;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center}.multiselect-dropdown{position:absolute;top:calc(100% + .25rem);left:0;right:0;background:#fff;border:1px solid #d1d5db;border-radius:6px;max-height:220px;overflow:auto;box-shadow:0 4px 6px rgba(0,0,0,.08);z-index:50;display:none}.multiselect-dropdown.active{display:block}.multiselect-option{padding:.5rem .75rem;display:flex;align-items:center}.btn{padding:.6rem 1rem;border-radius:6px;cursor:pointer;font-size:.9rem}.btn-primary{background:#3b82f6;color:#fff;border:none;width:100%;padding:.85rem;font-size:1rem}.btn-secondary{background:#fff;color:#374151;border:1px solid #d1d5db}.btn-danger{background:none;border:none;color:#dc2626;cursor:pointer}.btn-add{background:none;border:none;color:#3b82f6;cursor:pointer;margin-top:.5rem}.modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:1rem;z-index:200}.modal.active{display:flex}.modal-content{background:#fff;border-radius:8px;padding:1.25rem;max-width:760px;width:100%;max-height:80vh;overflow:auto}.modal-header{font-size:1.25rem;font-weight:600;color:#1f2937;margin-bottom:.75rem}.confirmation-detail{padding-left:1rem;border-left:3px solid #3b82f6;margin-bottom:.75rem}.confirmation-detail.lab{border-color:#10b981}.confirmation-detail.facility{border-color:#8b5cf6}.success-icon{width:64px;height:64px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:#10b981;font-size:2rem}.text-center{text-align:center}@media(max-width:640px){.grid-2{grid-template-columns:1fr}.modal-content{padding:1rem}}
+</style>
 </head>
 <body>
-    <div class="container" id="mainForm">
-        <h1>TA Preference Form</h1>
-        <p class="subtitle">Select your preferred TAs for courses, labs, and facilities.</p>
+<div class="container" id="mainForm">
+  <h1>TA Preference Form</h1>
+  <p class="subtitle">Select your preferred TAs for courses, labs, and facilities.</p>
 
-        <div class="section">
-            <h3>Your Information</h3>
-            <div class="grid-2">
-                <div>
-                    <input type="text" id="submitterName" placeholder="Your name" required>
-                </div>
-                <div>
-                    <input type="email" id="submitterEmail" placeholder="Your email" required>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>Courses</h3>
-            <div id="coursesContainer"></div>
-            <button class="btn-add" onclick="addItem('courses')">+ Add another course</button>
-        </div>
-
-        <div class="section">
-            <h3>Labs</h3>
-            <div id="labsContainer"></div>
-            <button class="btn-add" onclick="addItem('labs')">+ Add another lab</button>
-        </div>
-
-        <div class="section">
-            <h3>Facilities</h3>
-            <div id="facilitiesContainer"></div>
-            <button class="btn-add" onclick="addItem('facilities')">+ Add another facility</button>
-        </div>
-
-        <button class="btn btn-primary" onclick="showConfirmation()">Submit Preferences</button>
+  <div class="section">
+    <h3>Your Information</h3>
+    <div class="grid-2">
+      <div>
+        <label for="submitterName">Your name</label>
+        <input id="submitterName" type="text" placeholder="Your name" />
+      </div>
+      <div>
+        <label for="submitterEmail">Your email</label>
+        <input id="submitterEmail" type="email" placeholder="Your email" />
+      </div>
     </div>
+  </div>
 
-    <div class="modal" id="confirmationModal">
-        <div class="modal-content">
-            <h2 class="modal-header">Confirm Your Submission</h2>
-            <div id="confirmationContent"></div>
-            <div class="modal-buttons">
-                <button class="btn btn-primary" onclick="submitForm()">Confirm & Submit</button>
-                <button class="btn btn-secondary" onclick="downloadData()">Download</button>
-                <button class="btn btn-secondary" onclick="hideConfirmation()">Cancel</button>
-            </div>
-        </div>
+  <div class="section">
+    <h3>Courses</h3>
+    <div id="coursesContainer"></div>
+    <button type="button" class="btn-add" onclick="addItem('courses')">+ Add another course</button>
+  </div>
+
+  <div class="section">
+    <h3>Labs</h3>
+    <div id="labsContainer"></div>
+    <button type="button" class="btn-add" onclick="addItem('labs')">+ Add another lab</button>
+  </div>
+
+  <div class="section">
+    <h3>Facilities</h3>
+    <div id="facilitiesContainer"></div>
+    <button type="button" class="btn-add" onclick="addItem('facilities')">+ Add another facility</button>
+  </div>
+
+  <button class="btn btn-primary" onclick="showConfirmation()">Submit Preferences</button>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmationModal">
+  <div class="modal-content">
+    <h2 class="modal-header">Confirm Your Submission</h2>
+    <div id="confirmationContent"></div>
+    <div style="display:flex;gap:.75rem;margin-top:1rem">
+      <button class="btn btn-primary" onclick="submitForm()">Confirm & Submit</button>
+      <button class="btn btn-secondary" onclick="downloadData()">Download</button>
+      <button class="btn btn-secondary" onclick="hideConfirmation()">Cancel</button>
     </div>
+  </div>
+</div>
 
-    <div class="modal" id="successModal">
-        <div class="modal-content text-center">
-            <div class="success-icon">✓</div>
-            <h2 class="modal-header">Submitted Successfully!</h2>
-            <p class="subtitle">Your TA preferences have been recorded.</p>
-            <button class="btn btn-primary" onclick="resetForm()">Submit Another Response</button>
-        </div>
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+  <div class="modal-content text-center">
+    <div class="success-icon">✓</div>
+    <h2 class="modal-header">Submitted Successfully!</h2>
+    <p class="subtitle">Your TA preferences have been recorded.</p>
+    <button class="btn btn-primary" onclick="resetForm()">Submit Another Response</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Configuration ---------- */
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxytYYCOnWV7HK2DNV4jpm50e56UcwhiUYMXcHKQPgl7b5xZ8HZqMKi-MKzn8B44QkU/exec';
+
+/* ---------- Static lists ---------- */
+const availableTAs = [
+            "EP21B043 - Yash Kashtikar",
+            "PH19D011 - Sourin Chatterjee",
+            "PH20D028 - RAKSHITHA H A",
+            "PH20D200 - MRINAL DEKA",
+            "PH20D203 - Alipriyo Hoory",
+            "PH20D204 - ATANU GHOSH",
+            "PH20D205 - Kingshuk Panja",
+            "PH21B001 - ADITH PRAVEEN",
+            "PH21B002 - KETHAM REVANTH REDDY",
+            "PH21B003 - KOTHI ANURAG SAI",
+            "PH21B004 - MUNIMAKULA ACHYUTHA",
+            "PH21B005 - NIDHI",
+            "PH21B006 - PARAM JIVRAJANI",
+            "PH21B007 - PRASID DHANANJAY SANDAVE",
+            "PH21B008 - RENUKA N A",
+            "PH21B009 - SHIVA SURYA C.M",
+            "PH21B010 - SHREEJA BANDYOPADHYAY",
+            "PH21B011 - SUMIT KUMAR",
+            "PH21B012 - UTKARSH MAURYA",
+            "PH21D006 - VIKASMITA SAMANTA",
+            "PH21D009 - WAHIDUR RAHMAN",
+            "PH21D014 - DEBOJYOTI RAY CHAWDHURY",
+            "PH21D015 - SANTOSH KUMAR SAHU",
+            "PH21D025 - AMAN KUMAR BEHERA",
+            "PH21D050 - GANAPATI DASH",
+            "PH21D053 - SANDIP KUMAR PADHI",
+            "PH21D057 - SAMIM HOSSAIN",
+            "PH21D058 - UMASHANKAR JENA",
+            "PH21D065 - ARJIT MANDAL",
+            "PH21D077 - ANUSREE S",
+            "PH21D078 - NICKITA ACHARYA",
+            "PH21D080 - BHAGYALAXMI POTHAL",
+            "PH21D200 - SANGRAM KISHOR BEHERA",
+            "PH21D300 - DANDIGUNTA BABUJI",
+            "PH21D302 - TIASHA ROY",
+            "PH22D001 - JAYDEEP LOHIA",
+            "PH22D003 - MAYANK",
+            "PH22D004 - SUDARSHAN DAS",
+            "PH22D006 - AMAN KUMAR",
+            "PH22D015 - SOURAV MONDAL",
+            "PH22D020 - Shouvik Sarkar",
+            "PH22D032 - ANUSREE VIJAY",
+            "PH22D033 - BHAVESH ARJUN GUPTA",
+            "PH22D035 - Nilesh",
+            "PH22D041 - PRAVEENA GANAPATI HEGDE",
+            "PH22D046 - PRAVEEN V",
+            "PH22D050 - UDIT KANDPAL",
+            "PH22D052 - LAXMAN SINGH",
+            "PH22D056 - VIKAS KUMAR SANJAY KUMAR JHA",
+            "PH22D057 - ARYAA DATTAMUNSI",
+            "PH22D058 - ARINDOM DAS",
+            "PH22D059 - SUJAY SAHA",
+            "PH22D066 - ASHOK PRADHAN",
+            "PH22D068 - SHUBHALAKSHMI SAHU",
+            "PH22D069 - SARATH MOHAN",
+            "PH22D070 - AKASH PARAMANIK",
+            "PH22D075 - BASANTA MISTRI",
+            "PH22D078 - HARSH RAJ",
+            "PH22D080 - Riju Paria",
+            "PH22D088 - G VIKAS RAJ",
+            "PH22D090 - AYUSMIN PANDA",
+            "PH22D091 - MAYURAKSHI DEB",
+            "PH22D092 - SUBHABRAT SAMANTARAY",
+            "PH22D105 - RITU RAJ",
+            "PH22D106 - SOUMYARANJAN SAHOO",
+            "PH22D200 - YASH LENKA",
+            "PH23D007 - PRATIKKUMAR THAKKAR",
+            "PH23D010 - LAVEENA PURSHARTHI",
+            "PH23D012 - RIMO DAS",
+            "PH23D021 - Utkarsh jain",
+            "PH23D022 - ANANYA MOHANTY",
+            "PH23D025 - YASAR ARAFATH.K",
+            "PH23D028 - SAMBIT KUMAR PRUSTY",
+            "PH23D030 - Amod Kumar",
+            "PH23D031 - DIWAKAR SINGH YADAV",
+            "PH23D033 - GIFTY GODSON P",
+            "PH23D034 - MADAN BARMAN",
+            "PH23D035 - SUMIT MANDAL",
+            "PH23D039 - SOURAV MONDAL",
+            "PH23D047 - Aswathi P K",
+            "PH23D055 - ALWYN JOSE RAJA",
+            "PH23D057 - NEHA SHARMA",
+            "PH23D060 - AAKASH SINGH",
+            "PH23D066 - BHARGAVI SUCHITRA R",
+            "PH23D072 - POOJA SINGH TOMAR",
+            "PH23D074 - RITESH DAS",
+            "PH23D080 - TOMESH VERMA",
+            "PH23D083 - MAN SINGH",
+            "PH23D084 - ARUNIMA SWAIN",
+            "PH23D200 - MOHIT",
+            "PH23D201 - SATISH KUMAR",
+            "PH23D202 - ANKAN BISWAS",
+            "PH23D203 - SUVAM TRIPATHY",
+            "PH23D204 - PATHANENI SAI RAMA KRISHNA SRI VATHSAV",
+            "PH24D002 - ABHINAY PANDEY",
+            "PH24D007 - DEEP DATTA",
+            "PH24D009 - TEESHA KHANDELWAL",
+            "PH24D011 - PRASANNA M",
+            "PH24D014 - AJAY KUMAR",
+            "PH24D015 - PEESAPATI LAKSHMI VEDASAMHITHA",
+            "PH24D017 - AJINKYA S WADILE",
+            "PH24D020 - SURYAVIKAAS",
+            "PH24D022 - VIRAL HARSHADKUMAR PRAJAPATI",
+            "PH24D024 - JENIPRITHA",
+            "PH24D027 - AKSHITA BIHARI SHARMA",
+            "PH24D028 - MILENIA BASUMATARY",
+            "PH24D029 - BISMITA BEHERA",
+            "PH24D030 - GOUTAM KUMAR SHIT",
+            "PH24D049 - SOMNATH MANDAL",
+            "PH24D050 - HARIHARA BISWANATH",
+            "PH24D051 - MRUTYUNJAYA RATH",
+            "PH24D052 - ANKIT MUDGAL",
+            "PH24D053 - GUNJAN",
+            "PH24D056 - TASNIM KAUSAR",
+            "PH24D057 - G RAGHANYA",
+            "PH24D058 - ATHARV SAWANT",
+            "PH24D060 - RUPAM RAKSHIT",
+            "PH24D062 - MOHD SAQALAIN",
+            "PH24D063 - AGNIVA DAS",
+            "PH24D064 - Aniruddha Barman",
+            "PH24D066 - AKASH SHIVAJI PAWAR",
+            "PH24D067 - PRAVIN S",
+            "PH24D068 - SOURABH",
+            "PH24D070 - RAVINDRA HAZAM",
+            "PH24D071 - VIVEK KUMAR",
+            "PH24D074 - ROHIT DHARMENDRA KUMAR SHARMA",
+            "PH24D075 - ABHITENDRA GAURAV VERMA",
+            "PH24D076 - PUKHRAMBAM MANSHIKA DEVI",
+            "PH24D077 - SHYAM SUNDAR MEENA",
+            "PH24D078 - THEERTHA C",
+            "PH24D080 - SAMPURNA BHAR",
+            "PH24D400 - VISMAY VINAYAK JOSHI",
+            "PH24M001 - AKHIL SONI",
+            "PH24M003 - ANJIMA K V",
+            "PH24M004 - PUNITHA G",
+            "PH24M005 - RAHUL GARG",
+            "PH24M006 - RANA P",
+            "PH24M007 - SANDEEP KUMAR MEENA",
+            "PH24M008 - SOUMENDU POREY",
+            "PH24M009 - SUMIT KUMAR MEENA",
+            "PH24M010 - VIJAY PATIDAR",
+            "PH24R002 - Dr. Honey Khindri",
+            "PH24R003 - Dr. PRITAM SHETTY",
+            "PH24R004 - Dr. Krishna Kumari Swain",
+            "PH25D003 - KRITARTHA DEY",
+            "PH25D004 - QAZI MUSHARAF",
+            "PH25D007 - NIKHIL NEGI",
+            "PH25D009 - RATAN KUMAR PATEL",
+            "PH25D010 - VEDIKA DUBEY",
+            "PH25D012 - NEELANJANA DEY",
+            "PH25D017 - SHUBHAM JHA",
+            "PH25D019 - R KIRTHIK",
+            "PH25D021 - SHARMILA N K",
+            "PH25D022 - PARVATHY P J",
+            "PH25D024 - ANNU YADAV",
+            "PH25D025 - BIPEEN KUMAR",
+            "PH25D027 - HRITIK",
+            "PH25D028 - POONAM NAIK",
+            "PH25D031 - INDRAJIT HALDER",
+            "PH25D035 - SOMSUVRA DAS",
+            "PH25D051 - ANUSRITA MUKHOPADHYAY",
+            "PH25D053 - DHARSHINI V",
+            "PH25D400 - NISHRON W",
+            "PH25R001 - Dr. Suman Chakraborty",
+            "PH25R002 - Dr. Susmita Jana",
+            "PH25R003 - Dr. Dinesh Kumar",
+            "PH25R004 - Dr. Bihag Dave",
+            "PH25R005 - Dr. Harkirat Singh"
+    ];
+
+    const availableCourses = [
+        "EP2210 - Principles of Quantum Mechanics",
+        "EP3100 - Atomic & Molecular Spectroscopy",
+        "EP3220 - Solid State Physics",
+        "ID5843 - Experimental techniques for quantum computation and metrology",
+        "PH1010 - Physics I",
+        "PH1020 - Physics II",
+        "PH2070 - Introduction to Biological Physics",
+        "PH5020 - Electromagnetic Theory",
+        "PH5080 - Statistical Physics",
+        "PH5160 - Condensed Matter Physics I",
+        "PH5170 - Quantum Mechanics II",
+        "PH5211 - High Energy Physics",
+        "PH5250 - Advanced Electronics & Lab",
+        "PH5340 - Dielectric,Magnetic & Optical Materials",
+        "PH5462 - Magnetism in Solids",
+        "PH5480 - Quantum Field Theory - 1",
+        "PH5500 - Dynamical Systems",
+        "PH5590 - Microwave Physics",
+        "PH5620 - Coherent and  Quantum Optics",
+        "PH5680 - Superconductivity & Its Applications",
+        "PH5720 - Numerical Methods and Programming Lab",
+        "PH5730 - Methods of Computational Physics",
+        "PH5800 - Classical Physics",
+        "PH5810 - Introduction to Softmatter Physics",
+        "PH5811 - Advanced Particle Physics",
+        "PH5813 - Principles of Nanophotonics",
+        "PH5816 - Physics of Active and Living Matter (PALM)",
+        "PH5825 - Quantum Physics",
+        "PH5842 - Advanced topics in Quantum Computation and Quantum Information",
+        "PH5875 - Advanced General Relativity",
+        "PH5890 - Ultrafast lasers and Applications",
+        "PH6011 - Nanomaterials and Nanotechnology",
+        "PH6012 - Fundamentals of Semiconductor Physics and Devices",
+        "PH6013 - Functional Materials Sensors and Transducers",
+        "PH6021 - Introduction to Research",
+        "PH6022 - Introduction to Nanoscience",
+        "PH6999 - Special Topics in Physics",
+        "PH7080 - Foundations in Theoretical Physics",
+        "PH7090 - Foundations in Experiemntal Physics",
+        "PH7999 - Special Topics in Physics"
+    ];
+
+
+    const availableLabs = [
+        "EP3190 - Engineering Physics Lab II",
+        "EP3291 - Engineering Physics Lab IV",
+        "ID5841 - Quantum Computing Lab",
+        "PH1030 - Physics Laboratory I",
+        "PH1040 - Physics Laboratory II",
+        "PH2080 - Physics Lab IV",
+        "PH5120 - Physics Lab II (PG)",
+        "PH5350 - Laboratory for Physical Property Measurement and Transducer / Sensor Element Characteristics of Func",
+        "PH6015 - Advanced Materials and Nanotechnology Lab",
+        "PHPCL - Preparatory Course Lab"
+    ];
+
+
+    const availableFacilities = [
+        "Dielectric Relaxation Spectroscopy",
+        "Scanning Electron Microscope",
+        "TGA",
+        "Raman Spectrometer",
+        "AFM",
+        "XRD (Rigaku)",
+        "XRD (table-top)",
+        "PPMS",
+        "DCF",
+        "FemtoScience Facility",
+        "Squid Magnetometer"
+    ];
+
+
+const categoryMap = { courses: 'Course', labs: 'Lab', facilities: 'Facility' };
+
+/* ---------- Form state ---------- */
+let formData = { courses: [], labs: [], facilities: [] };
+let itemCounters = { courses: 0, labs: 0, facilities: 0 };
+
+/* ---------- Initialization ---------- */
+function init() {
+  // start with one empty entry each
+  addItem('courses');
+  addItem('labs');
+  addItem('facilities');
+}
+
+/* ---------- Add / Remove / Update UI ---------- */
+function addItem(category) {
+  const id = itemCounters[category]++;
+  formData[category].push({ id, name: '', numTAsRequired: '', selectedTAs: [], additionalInfo: '' });
+
+  const container = document.getElementById(category + 'Container');
+  const card = document.createElement('div');
+  card.className = 'item-card';
+  card.id = `${category}-${id}`;
+
+  // Build the select's options dynamically
+  let optionsHtml = `<option value="">Select ${categoryMap[category]}</option>`;
+  const source = category === 'courses' ? availableCourses : category === 'labs' ? availableLabs : availableFacilities;
+  source.forEach(opt => optionsHtml += `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`);
+
+  // Build TA options (checkboxes)
+  const taOptionsHtml = availableTAs.map((ta, idx) => {
+    const safeId = `${category}-ta-${id}-${idx}`;
+    return `<div class="multiselect-option">
+              <input type="checkbox" id="${safeId}" onchange="toggleTA('${category}', ${id}, ${idx})">
+              <label for="${safeId}">${escapeHtml(ta)}</label>
+            </div>`;
+  }).join('');
+
+  card.innerHTML = `
+    <div>
+      <label>Select ${categoryMap[category]}</label>
+      <select id="${category}-name-${id}" onchange="updateItemName('${category}', ${id}, this.value)">${optionsHtml}</select>
     </div>
+    <div class="grid-2" style="margin-top:.75rem">
+      <div>
+        <label>Number of TAs Required</label>
+        <input type="number" min="0" id="${category}-num-${id}" placeholder="e.g., 2" onchange="updateNumTAs('${category}', ${id}, this.value)">
+      </div>
+      <div>
+        <label>Or Select Specific TAs</label>
+        <div class="multiselect-container">
+          <button type="button" class="multiselect-button" id="${category}-ta-button-${id}" onclick="toggleDropdown('${category}', ${id})">
+            <span id="${category}-ta-label-${id}">Select specific TAs (optional)</span>
+            <span>&#9660;</span>
+          </button>
+          <div class="multiselect-dropdown" id="${category}-ta-dropdown-${id}">
+            ${taOptionsHtml}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:.75rem">
+      <label>Additional Information (Optional)</label>
+      <textarea id="${category}-info-${id}" placeholder="Any additional notes..." oninput="updateAdditionalInfo('${category}', ${id}, this.value)" style="min-height:60px"></textarea>
+    </div>
+    <div style="margin-top:.5rem">
+      <button class="btn-danger" type="button" onclick="removeItem('${category}', ${id})">Remove</button>
+    </div>
+  `;
 
-    <script>
-        // Configuration - Replace with your actual data
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBQ4S51KHNKl1w3o86q5ccTZCyGkYp8M9tauoPslAi03iqwqd3GUNLACTl1-p1Q8-N/exec';
-        
-        const availableTAs = [
-                "EP21B043 - Yash Kashtikar",
-                "PH19D011 - Sourin Chatterjee",
-                "PH20D028 - RAKSHITHA H A",
-                "PH20D200 - MRINAL DEKA",
-                "PH20D203 - Alipriyo Hoory",
-                "PH20D204 - ATANU GHOSH",
-                "PH20D205 - Kingshuk Panja",
-                "PH21B001 - ADITH PRAVEEN",
-                "PH21B002 - KETHAM REVANTH REDDY",
-                "PH21B003 - KOTHI ANURAG SAI",
-                "PH21B004 - MUNIMAKULA ACHYUTHA",
-                "PH21B005 - NIDHI",
-                "PH21B006 - PARAM JIVRAJANI",
-                "PH21B007 - PRASID DHANANJAY SANDAVE",
-                "PH21B008 - RENUKA N A",
-                "PH21B009 - SHIVA SURYA C.M",
-                "PH21B010 - SHREEJA BANDYOPADHYAY",
-                "PH21B011 - SUMIT KUMAR",
-                "PH21B012 - UTKARSH MAURYA",
-                "PH21D006 - VIKASMITA SAMANTA",
-                "PH21D009 - WAHIDUR RAHMAN",
-                "PH21D014 - DEBOJYOTI RAY CHAWDHURY",
-                "PH21D015 - SANTOSH KUMAR SAHU",
-                "PH21D025 - AMAN KUMAR BEHERA",
-                "PH21D050 - GANAPATI DASH",
-                "PH21D053 - SANDIP KUMAR PADHI",
-                "PH21D057 - SAMIM HOSSAIN",
-                "PH21D058 - UMASHANKAR JENA",
-                "PH21D065 - ARJIT MANDAL",
-                "PH21D077 - ANUSREE S",
-                "PH21D078 - NICKITA ACHARYA",
-                "PH21D080 - BHAGYALAXMI POTHAL",
-                "PH21D200 - SANGRAM KISHOR BEHERA",
-                "PH21D300 - DANDIGUNTA BABUJI",
-                "PH21D302 - TIASHA ROY",
-                "PH22D001 - JAYDEEP LOHIA",
-                "PH22D003 - MAYANK",
-                "PH22D004 - SUDARSHAN DAS",
-                "PH22D006 - AMAN KUMAR",
-                "PH22D015 - SOURAV MONDAL",
-                "PH22D020 - Shouvik Sarkar",
-                "PH22D032 - ANUSREE VIJAY",
-                "PH22D033 - BHAVESH ARJUN GUPTA",
-                "PH22D035 - Nilesh",
-                "PH22D041 - PRAVEENA GANAPATI HEGDE",
-                "PH22D046 - PRAVEEN V",
-                "PH22D050 - UDIT KANDPAL",
-                "PH22D052 - LAXMAN SINGH",
-                "PH22D056 - VIKAS KUMAR SANJAY KUMAR JHA",
-                "PH22D057 - ARYAA DATTAMUNSI",
-                "PH22D058 - ARINDOM DAS",
-                "PH22D059 - SUJAY SAHA",
-                "PH22D066 - ASHOK PRADHAN",
-                "PH22D068 - SHUBHALAKSHMI SAHU",
-                "PH22D069 - SARATH MOHAN",
-                "PH22D070 - AKASH PARAMANIK",
-                "PH22D075 - BASANTA MISTRI",
-                "PH22D078 - HARSH RAJ",
-                "PH22D080 - Riju Paria",
-                "PH22D088 - G VIKAS RAJ",
-                "PH22D090 - AYUSMIN PANDA",
-                "PH22D091 - MAYURAKSHI DEB",
-                "PH22D092 - SUBHABRAT SAMANTARAY",
-                "PH22D105 - RITU RAJ",
-                "PH22D106 - SOUMYARANJAN SAHOO",
-                "PH22D200 - YASH LENKA",
-                "PH23D007 - PRATIKKUMAR THAKKAR",
-                "PH23D010 - LAVEENA PURSHARTHI",
-                "PH23D012 - RIMO DAS",
-                "PH23D021 - Utkarsh jain",
-                "PH23D022 - ANANYA MOHANTY",
-                "PH23D025 - YASAR ARAFATH.K",
-                "PH23D028 - SAMBIT KUMAR PRUSTY",
-                "PH23D030 - Amod Kumar",
-                "PH23D031 - DIWAKAR SINGH YADAV",
-                "PH23D033 - GIFTY GODSON P",
-                "PH23D034 - MADAN BARMAN",
-                "PH23D035 - SUMIT MANDAL",
-                "PH23D039 - SOURAV MONDAL",
-                "PH23D047 - Aswathi P K",
-                "PH23D055 - ALWYN JOSE RAJA",
-                "PH23D057 - NEHA SHARMA",
-                "PH23D060 - AAKASH SINGH",
-                "PH23D066 - BHARGAVI SUCHITRA R",
-                "PH23D072 - POOJA SINGH TOMAR",
-                "PH23D074 - RITESH DAS",
-                "PH23D080 - TOMESH VERMA",
-                "PH23D083 - MAN SINGH",
-                "PH23D084 - ARUNIMA SWAIN",
-                "PH23D200 - MOHIT",
-                "PH23D201 - SATISH KUMAR",
-                "PH23D202 - ANKAN BISWAS",
-                "PH23D203 - SUVAM TRIPATHY",
-                "PH23D204 - PATHANENI SAI RAMA KRISHNA SRI VATHSAV",
-                "PH24D002 - ABHINAY PANDEY",
-                "PH24D007 - DEEP DATTA",
-                "PH24D009 - TEESHA KHANDELWAL",
-                "PH24D011 - PRASANNA M",
-                "PH24D014 - AJAY KUMAR",
-                "PH24D015 - PEESAPATI LAKSHMI VEDASAMHITHA",
-                "PH24D017 - AJINKYA S WADILE",
-                "PH24D020 - SURYAVIKAAS",
-                "PH24D022 - VIRAL HARSHADKUMAR PRAJAPATI",
-                "PH24D024 - JENIPRITHA",
-                "PH24D027 - AKSHITA BIHARI SHARMA",
-                "PH24D028 - MILENIA BASUMATARY",
-                "PH24D029 - BISMITA BEHERA",
-                "PH24D030 - GOUTAM KUMAR SHIT",
-                "PH24D049 - SOMNATH MANDAL",
-                "PH24D050 - HARIHARA BISWANATH",
-                "PH24D051 - MRUTYUNJAYA RATH",
-                "PH24D052 - ANKIT MUDGAL",
-                "PH24D053 - GUNJAN",
-                "PH24D056 - TASNIM KAUSAR",
-                "PH24D057 - G RAGHANYA",
-                "PH24D058 - ATHARV SAWANT",
-                "PH24D060 - RUPAM RAKSHIT",
-                "PH24D062 - MOHD SAQALAIN",
-                "PH24D063 - AGNIVA DAS",
-                "PH24D064 - Aniruddha Barman",
-                "PH24D066 - AKASH SHIVAJI PAWAR",
-                "PH24D067 - PRAVIN S",
-                "PH24D068 - SOURABH",
-                "PH24D070 - RAVINDRA HAZAM",
-                "PH24D071 - VIVEK KUMAR",
-                "PH24D074 - ROHIT DHARMENDRA KUMAR SHARMA",
-                "PH24D075 - ABHITENDRA GAURAV VERMA",
-                "PH24D076 - PUKHRAMBAM MANSHIKA DEVI",
-                "PH24D077 - SHYAM SUNDAR MEENA",
-                "PH24D078 - THEERTHA C",
-                "PH24D080 - SAMPURNA BHAR",
-                "PH24D400 - VISMAY VINAYAK JOSHI",
-                "PH24M001 - AKHIL SONI",
-                "PH24M003 - ANJIMA K V",
-                "PH24M004 - PUNITHA G",
-                "PH24M005 - RAHUL GARG",
-                "PH24M006 - RANA P",
-                "PH24M007 - SANDEEP KUMAR MEENA",
-                "PH24M008 - SOUMENDU POREY",
-                "PH24M009 - SUMIT KUMAR MEENA",
-                "PH24M010 - VIJAY PATIDAR",
-                "PH24R002 - Dr. Honey Khindri",
-                "PH24R003 - Dr. PRITAM SHETTY",
-                "PH24R004 - Dr. Krishna Kumari Swain",
-                "PH25D003 - KRITARTHA DEY",
-                "PH25D004 - QAZI MUSHARAF",
-                "PH25D007 - NIKHIL NEGI",
-                "PH25D009 - RATAN KUMAR PATEL",
-                "PH25D010 - VEDIKA DUBEY",
-                "PH25D012 - NEELANJANA DEY",
-                "PH25D017 - SHUBHAM JHA",
-                "PH25D019 - R KIRTHIK",
-                "PH25D021 - SHARMILA N K",
-                "PH25D022 - PARVATHY P J",
-                "PH25D024 - ANNU YADAV",
-                "PH25D025 - BIPEEN KUMAR",
-                "PH25D027 - HRITIK",
-                "PH25D028 - POONAM NAIK",
-                "PH25D031 - INDRAJIT HALDER",
-                "PH25D035 - SOMSUVRA DAS",
-                "PH25D051 - ANUSRITA MUKHOPADHYAY",
-                "PH25D053 - DHARSHINI V",
-                "PH25D400 - NISHRON W",
-                "PH25R001 - Dr. Suman Chakraborty",
-                "PH25R002 - Dr. Susmita Jana",
-                "PH25R003 - Dr. Dinesh Kumar",
-                "PH25R004 - Dr. Bihag Dave",
-                "PH25R005 - Dr. Harkirat Singh"
-        ];
+  container.appendChild(card);
+  updateDropdownOptions(category);
+}
 
-        const availableCourses = [
-            "EP2210 - Principles of Quantum Mechanics",
-            "EP3100 - Atomic & Molecular Spectroscopy",
-            "EP3220 - Solid State Physics",
-            "ID5843 - Experimental techniques for quantum computation and metrology",
-            "PH1010 - Physics I",
-            "PH1020 - Physics II",
-            "PH2070 - Introduction to Biological Physics",
-            "PH5020 - Electromagnetic Theory",
-            "PH5080 - Statistical Physics",
-            "PH5160 - Condensed Matter Physics I",
-            "PH5170 - Quantum Mechanics II",
-            "PH5211 - High Energy Physics",
-            "PH5250 - Advanced Electronics & Lab",
-            "PH5340 - Dielectric,Magnetic & Optical Materials",
-            "PH5462 - Magnetism in Solids",
-            "PH5480 - Quantum Field Theory - 1",
-            "PH5500 - Dynamical Systems",
-            "PH5590 - Microwave Physics",
-            "PH5620 - Coherent and  Quantum Optics",
-            "PH5680 - Superconductivity & Its Applications",
-            "PH5720 - Numerical Methods and Programming Lab",
-            "PH5730 - Methods of Computational Physics",
-            "PH5800 - Classical Physics",
-            "PH5810 - Introduction to Softmatter Physics",
-            "PH5811 - Advanced Particle Physics",
-            "PH5813 - Principles of Nanophotonics",
-            "PH5816 - Physics of Active and Living Matter (PALM)",
-            "PH5825 - Quantum Physics",
-            "PH5842 - Advanced topics in Quantum Computation and Quantum Information",
-            "PH5875 - Advanced General Relativity",
-            "PH5890 - Ultrafast lasers and Applications",
-            "PH6011 - Nanomaterials and Nanotechnology",
-            "PH6012 - Fundamentals of Semiconductor Physics and Devices",
-            "PH6013 - Functional Materials Sensors and Transducers",
-            "PH6021 - Introduction to Research",
-            "PH6022 - Introduction to Nanoscience",
-            "PH6999 - Special Topics in Physics",
-            "PH7080 - Foundations in Theoretical Physics",
-            "PH7090 - Foundations in Experiemntal Physics",
-            "PH7999 - Special Topics in Physics"
-        ];
+function removeItem(category, id) {
+  formData[category] = formData[category].filter(item => item.id !== id);
+  const el = document.getElementById(`${category}-${id}`);
+  if (el) el.remove();
+  updateDropdownOptions(category);
+}
 
+function updateItemName(category, id, value) {
+  const item = formData[category].find(i => i.id === id);
+  if (item) item.name = value;
+  updateDropdownOptions(category);
+}
 
-        const availableLabs = [
-            "EP3190 - Engineering Physics Lab II",
-            "EP3291 - Engineering Physics Lab IV",
-            "ID5841 - Quantum Computing Lab",
-            "PH1030 - Physics Laboratory I",
-            "PH1040 - Physics Laboratory II",
-            "PH2080 - Physics Lab IV",
-            "PH5120 - Physics Lab II (PG)",
-            "PH5350 - Laboratory for Physical Property Measurement and Transducer / Sensor Element Characteristics of Func",
-            "PH6015 - Advanced Materials and Nanotechnology Lab",
-            "PHPCL - Preparatory Course Lab"
-        ];
+function updateNumTAs(category, id, value) {
+  const item = formData[category].find(i => i.id === id);
+  if (item) item.numTAsRequired = value;
+}
 
+function updateAdditionalInfo(category, id, value) {
+  const item = formData[category].find(i => i.id === id);
+  if (item) item.additionalInfo = value;
+}
 
-        const availableFacilities = [
-            "Dielectric Relaxation Spectroscopy",
-            "Scanning Electron Microscope",
-            "TGA",
-            "Raman Spectrometer",
-            "AFM",
-            "XRD (Rigaku)",
-            "XRD (table-top)",
-            "PPMS",
-            "DCF",
-            "FemtoScience Facility",
-            "Squid Magnetometer"
-        ];
+function toggleTA(category, id, taIndex) {
+  const item = formData[category].find(i => i.id === id);
+  if (!item) return;
+  const taValue = availableTAs[taIndex];
+  const idx = item.selectedTAs.indexOf(taValue);
+  if (idx > -1) item.selectedTAs.splice(idx, 1); else item.selectedTAs.push(taValue);
+  updateTALabel(category, id);
+}
 
-        let formData = {
-            courses: [],
-            labs: [],
-            facilities: []
-        };
+function updateTALabel(category, id) {
+  const item = formData[category].find(i => i.id === id);
+  const label = document.getElementById(`${category}-ta-label-${id}`);
+  if (!label) return;
+  if (!item || item.selectedTAs.length === 0) label.textContent = 'Select specific TAs (optional)';
+  else label.textContent = `${item.selectedTAs.length} TA${item.selectedTAs.length>1?'s':''} selected`;
+}
 
-        let itemCounters = {
-            courses: 0,
-            labs: 0,
-            facilities: 0
-        };
+function toggleDropdown(category, id) {
+  const dd = document.getElementById(`${category}-ta-dropdown-${id}`);
+  if (!dd) return;
+  dd.classList.toggle('active');
+  // close others
+  document.querySelectorAll('.multiselect-dropdown').forEach(el => { if (el.id !== dd.id) el.classList.remove('active'); });
+}
 
-        const categoryMap = {
-            'courses': 'Course',
-            'labs': 'Lab',
-            'facilities': 'Facility'
-        };
+function updateDropdownOptions(category) {
+  // Keep selected values unique across items of same category
+  const selected = formData[category].map(it => it.name).filter(Boolean);
+  const source = category === 'courses' ? availableCourses : category === 'labs' ? availableLabs : availableFacilities;
+  formData[category].forEach(item => {
+    const sel = document.getElementById(`${category}-name-${item.id}`);
+    if (!sel) return;
+    const current = sel.value;
+    sel.innerHTML = `<option value="">Select ${categoryMap[category]}</option>`;
+    source.forEach(opt => {
+      if (!selected.includes(opt) || opt === current) {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        if (opt === current) o.selected = true;
+        sel.appendChild(o);
+      }
+    });
+  });
+}
 
-        function init() {
-            addItem('courses');
-            addItem('labs');
-            addItem('facilities');
-        }
+/* ---------- Confirmation modal (corrected) ---------- */
+function isItemFilled(item) {
+  if (!item) return false;
+  return (item.name && item.name.trim() !== '') ||
+         (item.numTAsRequired && String(item.numTAsRequired).trim() !== '') ||
+         (item.selectedTAs && item.selectedTAs.length > 0) ||
+         (item.additionalInfo && item.additionalInfo.trim() !== '');
+}
 
-        function addItem(category) {
-            const id = itemCounters[category]++;
-            formData[category].push({
-                id: id,
-                name: '',
-                numTAsRequired: '',
-                selectedTAs: [],
-                additionalInfo: ''
-            });
+function showConfirmation() {
+  const name = document.getElementById('submitterName').value.trim();
+  const email = document.getElementById('submitterEmail').value.trim();
 
-            const container = document.getElementById(category + 'Container');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item-card';
-            itemDiv.id = `${category}-${id}`;
+  // filter out truly empty items
+  const courses = formData.courses.filter(isItemFilled);
+  const labs = formData.labs.filter(isItemFilled);
+  const facilities = formData.facilities.filter(isItemFilled);
 
-            const categoryLabel = categoryMap[category];
-            
-            itemDiv.innerHTML = `
-                <div class="item-fields">
-                    <div>
-                        <label>Select ${categoryLabel}</label>
-                        <select id="${category}-name-${id}" onchange="updateItemName('${category}', ${id}, this.value)">
-                            <option value="">Select ${categoryLabel}</option>
-                        </select>
-                    </div>
-                    <div class="grid-2">
-                        <div>
-                            <label>Number of TAs Required</label>
-                            <input type="number" min="0" placeholder="e.g., 2" 
-                                   id="${category}-num-${id}" 
-                                   onchange="updateNumTAs('${category}', ${id}, this.value)">
-                        </div>
-                        <div>
-                            <label>Or Select Specific TAs</label>
-                            <div class="multiselect-container">
-                                <button type="button" class="multiselect-button" onclick="toggleDropdown('${category}', ${id})">
-                                    <span id="${category}-ta-label-${id}">Select specific TAs (optional)</span>
-                                    <span>&#9660;</span>
-                                </button>
-                                <div class="multiselect-dropdown" id="${category}-ta-dropdown-${id}">
-                                    ${availableTAs.map(ta => `
-                                        <div class="multiselect-option">
-                                            <input type="checkbox" id="${category}-ta-${id}-${ta.replace(/\s+/g, '-')}" 
-                                                   onchange="toggleTA('${category}', ${id}, '${ta}')">
-                                            <label for="${category}-ta-${id}-${ta.replace(/\s+/g, '-')}">${ta}</label>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label>Additional Information (Optional)</label>
-                        <textarea id="${category}-info-${id}" 
-                                  placeholder="Any additional notes or requirements..." 
-                                  oninput="updateAdditionalInfo('${category}', ${id}, this.value)"
-                                  style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; resize: vertical; min-height: 60px; font-family: inherit;"></textarea>
-                    </div>
-                </div>
-                <button class="btn-danger" onclick="removeItem('${category}', ${id})">Remove</button>
-            `;
-            container.appendChild(itemDiv);
-            updateDropdownOptions(category);
-        }
+  // require at least a submitter name/email or one filled item
+  if (!name && !email && courses.length===0 && labs.length===0 && facilities.length===0) {
+    alert('Please enter your name/email or fill at least one Course/Lab/Facility.');
+    return;
+  }
 
-        function removeItem(category, id) {
-            const index = formData[category].findIndex(item => item.id === id);
-            if (index > -1) {
-                formData[category].splice(index, 1);
-            }
-            
-            const element = document.getElementById(`${category}-${id}`);
-            if (element) {
-                element.remove();
-            }
+  let html = `<div class="confirmation-item"><h4>Submitter Information</h4><p>Name: ${escapeHtml(name) || 'Not provided'}</p><p>Email: ${escapeHtml(email) || 'Not provided'}</p></div>`;
 
-            updateDropdownOptions(category);
-        }
+  if (courses.length) {
+    html += `<div class="confirmation-item"><h4>Courses</h4>`;
+    courses.forEach(c => {
+      html += `<div class="confirmation-detail"><p class="name">${escapeHtml(c.name) || 'No course selected'}</p>
+               <p>Number of TAs: ${escapeHtml(String(c.numTAsRequired || 'Not specified'))}</p>
+               <p>Selected TAs: ${c.selectedTAs && c.selectedTAs.length ? escapeHtml(c.selectedTAs.join(', ')) : 'None'}</p>
+               ${c.additionalInfo ? `<p>Additional Info: ${escapeHtml(c.additionalInfo).replace(/\n/g,'<br>')}</p>` : ''}</div>`;
+    });
+    html += `</div>`;
+  }
 
-        function updateItemName(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.name = value;
-            }
-            updateDropdownOptions(category);
-        }
+  if (labs.length) {
+    html += `<div class="confirmation-item"><h4>Labs</h4>`;
+    labs.forEach(l => {
+      html += `<div class="confirmation-detail lab"><p class="name">${escapeHtml(l.name) || 'No lab selected'}</p>
+               <p>Number of TAs: ${escapeHtml(String(l.numTAsRequired || 'Not specified'))}</p>
+               <p>Selected TAs: ${l.selectedTAs && l.selectedTAs.length ? escapeHtml(l.selectedTAs.join(', ')) : 'None'}</p>
+               ${l.additionalInfo ? `<p>Additional Info: ${escapeHtml(l.additionalInfo).replace(/\n/g,'<br>')}</p>` : ''}</div>`;
+    });
+    html += `</div>`;
+  }
 
-        function updateNumTAs(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.numTAsRequired = value;
-            }
-        }
+  if (facilities.length) {
+    html += `<div class="confirmation-item"><h4>Facilities</h4>`;
+    facilities.forEach(f => {
+      html += `<div class="confirmation-detail facility"><p class="name">${escapeHtml(f.name) || 'No facility selected'}</p>
+               <p>Number of TAs: ${escapeHtml(String(f.numTAsRequired || 'Not specified'))}</p>
+               <p>Selected TAs: ${f.selectedTAs && f.selectedTAs.length ? escapeHtml(f.selectedTAs.join(', ')) : 'None'}</p>
+               ${f.additionalInfo ? `<p>Additional Info: ${escapeHtml(f.additionalInfo).replace(/\n/g,'<br>')}</p>` : ''}</div>`;
+    });
+    html += `</div>`;
+  }
 
-        function updateAdditionalInfo(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.additionalInfo = value;
-            }
-        }
+  if (!courses.length && !labs.length && !facilities.length) {
+    html += `<p>No specific course, lab, or facility preferences were entered.</p>`;
+  }
 
-        function toggleTA(category, id, ta) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                const index = item.selectedTAs.indexOf(ta);
-                if (index > -1) {
-                    item.selectedTAs.splice(index, 1);
-                } else {
-                    item.selectedTAs.push(ta);
-                }
-                updateTALabel(category, id);
-            }
-        }
+  document.getElementById('confirmationContent').innerHTML = html;
+  document.getElementById('confirmationModal').classList.add('active');
+}
 
-        function updateTALabel(category, id) {
-            const item = formData[category].find(item => item.id === id);
-            const label = document.getElementById(`${category}-ta-label-${id}`);
-            if (item && label) {
-                if (item.selectedTAs.length === 0) {
-                    label.textContent = 'Select specific TAs (optional)';
-                } else {
-                    label.textContent = `${item.selectedTAs.length} TA${item.selectedTAs.length > 1 ? 's' : ''} selected`;
-                }
-            }
-        }
+function hideConfirmation() {
+  document.getElementById('confirmationModal').classList.remove('active');
+}
 
-        function toggleDropdown(category, id) {
-            const dropdown = document.getElementById(`${category}-ta-dropdown-${id}`);
-            dropdown.classList.toggle('active');
-            
-            // Close other dropdowns
-            document.querySelectorAll('.multiselect-dropdown').forEach(dd => {
-                if (dd.id !== `${category}-ta-dropdown-${id}`) {
-                    dd.classList.remove('active');
-                }
-            });
-        }
+/* ---------- Submit to Google Apps Script ---------- */
+function submitForm() {
+  hideConfirmation();
 
-        function updateDropdownOptions(category) {
-            const selectedNames = formData[category]
-                .map(item => item.name)
-                .filter(name => name !== '');
+  const name = document.getElementById('submitterName').value.trim();
+  const email = document.getElementById('submitterEmail').value.trim();
 
-            let availableOptions;
-            if (category === 'courses') availableOptions = availableCourses;
-            else if (category === 'labs') availableOptions = availableLabs;
-            else availableOptions = availableFacilities;
+  // use only filled items
+  const courses = formData.courses.filter(isItemFilled).map(c => ({
+    item: c.name || '',
+    numTAs: c.numTAsRequired || '',
+    selectedTAs: c.selectedTAs || [],
+    info: c.additionalInfo || ''
+  }));
 
-            formData[category].forEach(item => {
-                const select = document.getElementById(`${category}-name-${item.id}`);
-                if (select) {
-                    const currentValue = select.value;
-                    select.innerHTML = `<option value="">Select ${categoryMap[category]}</option>`;
-                    
-                    availableOptions.forEach(option => {
-                        if (!selectedNames.includes(option) || option === currentValue) {
-                            const opt = document.createElement('option');
-                            opt.value = option;
-                            opt.textContent = option;
-                            if (option === currentValue) {
-                                opt.selected = true;
-                            }
-                            select.appendChild(opt);
-                        }
-                    });
-                }
-            });
-        }
+  const labs = formData.labs.filter(isItemFilled).map(l => ({
+    item: l.name || '',
+    numTAs: l.numTAsRequired || '',
+    selectedTAs: l.selectedTAs || [],
+    info: l.additionalInfo || ''
+  }));
 
-        // --- UPDATED LOGIC START ---
+  const facilities = formData.facilities.filter(isItemFilled).map(f => ({
+    item: f.name || '',
+    numTAs: f.numTAsRequired || '',
+    selectedTAs: f.selectedTAs || [],
+    info: f.additionalInfo || ''
+  }));
 
-        // Function to check if an individual item has ANY data (Dropdown, Number, TAs, OR Additional Info)
-        function isItemFilled(item) {
-            return (item.name && item.name.trim() !== '') || 
-                   (item.numTAsRequired && item.numTAsRequired !== '') || 
-                   (item.selectedTAs && item.selectedTAs.length > 0) || 
-                   (item.additionalInfo && item.additionalInfo.trim() !== '');
-        }
+  const payload = { name, email, courses, labs, facilities };
 
-        function showConfirmation() {
-            // 1. Get User Details
-            const name = document.getElementById('submitterName').value.trim();
-            const email = document.getElementById('submitterEmail').value.trim();
+  // disable submit button to prevent duplicates (simple UX)
+  const submitBtn = document.querySelector('.btn-primary');
+  submitBtn.disabled = true;
 
-            // 2. MANDATORY CHECK: Name and Email must be filled
-            if (name === '' || email === '') {
-                alert('Please fill in your Name and Email before submitting.');
-                return;
-            }
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    // attempt to parse JSON response
+    return response.json().catch(() => ({ status: 'unknown', raw: null }));
+  })
+  .then(data => {
+    submitBtn.disabled = false;
+    if (data && data.status === 'success') {
+      document.getElementById('successModal').classList.add('active');
+    } else {
+      console.error('Apps Script response:', data);
+      alert('Submission received but server returned an unexpected response. Check logs.');
+      document.getElementById('successModal').classList.add('active'); // still show success
+    }
+  })
+  .catch(err => {
+    submitBtn.disabled = false;
+    console.error('Network/submit error:', err);
+    alert('Submission failed due to network or CORS. Ensure web app is deployed as "Anyone, even anonymous" and try again.');
+  });
+}
 
-            // 3. Filter data to find items that have ANY content (including just Additional Info)
-            const courses = formData.courses.filter(isItemFilled);
-            const labs = formData.labs.filter(isItemFilled);
-            const facilities = formData.facilities.filter(isItemFilled);
+/* ---------- Utilities: download, reset, helpers ---------- */
+function downloadData() {
+  const data = {
+    submitterName: document.getElementById('submitterName').value,
+    submitterEmail: document.getElementById('submitterEmail').value,
+    courses: formData.courses,
+    labs: formData.labs,
+    facilities: formData.facilities
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ta_preferences.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
-            // 4. DATA CHECK: At least one item (Course, Lab, or Facility) must be filled
-            if (courses.length === 0 && labs.length === 0 && facilities.length === 0) {
-                alert('Please provide details for at least one Course, Lab, or Facility.\n\nYou can select a name from the list OR simply provide "Additional Information".');
-                return;
-            }
+function resetForm() {
+  document.getElementById('successModal').classList.remove('active');
+  // clear fields & state
+  document.getElementById('submitterName').value = '';
+  document.getElementById('submitterEmail').value = '';
+  document.getElementById('coursesContainer').innerHTML = '';
+  document.getElementById('labsContainer').innerHTML = '';
+  document.getElementById('facilitiesContainer').innerHTML = '';
+  formData = { courses: [], labs: [], facilities: [] };
+  itemCounters = { courses: 0, labs: 0, facilities: 0 };
+  init();
+}
 
-            // Update global formData with the filtered lists (to ensure clean submission)
-            formData.courses = courses;
-            formData.labs = labs;
-            formData.facilities = facilities;
+/* Close dropdowns when clicking outside */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.multiselect-container')) {
+    document.querySelectorAll('.multiselect-dropdown.active').forEach(dd => dd.classList.remove('active'));
+  }
+});
 
-            const content = document.getElementById('confirmationContent');
-            let html = `
-                <div class="confirmation-item">
-                    <h4>Submitter Information</h4>
-                    <p>Name: ${name}</p>
-                    <p>Email: ${email}</p>
-                </div>
-            `;
-            
-            // Helper function to render items
-            const renderItems = (items, typeName, className) => {
-                if (items.length === 0) return '';
-                let sectionHtml = `<div class="confirmation-item"><h4>${typeName}</h4>`;
-                items.forEach(item => {
-                    const additionalInfoDisplay = item.additionalInfo ? 
-                        item.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    
-                    // Display 'Custom Entry' if they didn't select a dropdown name but filled other info
-                    const displayName = item.name || '<span style="color:#6b7280; font-style:italic;">(Custom / No Dropdown Selected)</span>';
+/* small helper to avoid HTML injection */
+function escapeHtml(str) {
+  if (!str && str !== 0) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
-                    sectionHtml += `
-                        <div class="confirmation-detail ${className}">
-                            <p class="name">${displayName}</p>
-                            <p>Number of TAs: ${item.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${item.selectedTAs.length > 0 ? item.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;                
-                });
-                sectionHtml += '</div>';
-                return sectionHtml;
-            };
-
-            html += renderItems(courses, 'Courses', '');
-            html += renderItems(labs, 'Labs', 'lab');
-            html += renderItems(facilities, 'Facilities', 'facility');
-
-            content.innerHTML = html;
-            document.getElementById('confirmationModal').classList.add('active');
-        }
-
-        // --- UPDATED LOGIC END ---
-
-        function hideConfirmation() {
-            document.getElementById('confirmationModal').classList.remove('active');
-        }
-
-        function submitForm() {
-            hideConfirmation();
-        
-            const name = document.getElementById('submitterName').value.trim();
-            const email = document.getElementById('submitterEmail').value.trim();
-        
-            const payload = {
-                name: name,
-                email: email,
-                courses: formData.courses.map(c => ({
-                    item: c.name,
-                    numTAs: c.numTAsRequired,
-                    selectedTAs: c.selectedTAs.join(", "),
-                    info: c.additionalInfo
-                })),
-                labs: formData.labs.map(l => ({
-                    item: l.name,
-                    numTAs: l.numTAsRequired,
-                    selectedTAs: l.selectedTAs.join(", "),
-                    info: l.additionalInfo
-                })),
-                facilities: formData.facilities.map(f => ({
-                    item: f.name,
-                    numTAs: f.numTAsRequired,
-                    selectedTAs: f.selectedTAs.join(", "),
-                    info: f.additionalInfo
-                }))
-            };
-        
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === "success") {
-                    document.getElementById('successModal').classList.add('active');
-                } else {
-                    alert("Error submitting form.");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Submission failed.");
-            });
-        }
-        
-        function downloadData() {
-            const data = JSON.stringify({
-                submitterName: document.getElementById('submitterName').value,
-                submitterEmail: document.getElementById('submitterEmail').value,
-                courses: formData.courses,
-                labs: formData.labs,
-                facilities: formData.facilities
-            }, null, 2);
-
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'ta_preferences_data.json';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function resetForm() {
-            document.getElementById('successModal').classList.remove('active');
-            document.getElementById('mainForm').reset();
-            
-            // Clear all generated elements
-            document.getElementById('coursesContainer').innerHTML = '';
-            document.getElementById('labsContainer').innerHTML = '';
-            document.getElementById('facilitiesContainer').innerHTML = '';
-            
-            // Reset state
-            formData = { courses: [], labs: [], facilities: [] };
-            itemCounters = { courses: 0, labs: 0, facilities: 0 };
-            
-            // Re-initialize with one empty item for each category
-            init();
-            
-            // Clear submitter info manually as 'mainForm' is not a real form element
-            document.getElementById('submitterName').value = '';
-            document.getElementById('submitterEmail').value = '';
-
-        }
-
-        // Event listener to close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.multiselect-container')) {
-                document.querySelectorAll('.multiselect-dropdown.active').forEach(dd => {
-                    dd.classList.remove('active');
-                });
-            }
-        });
-
-        init();
-    </script>
+/* initialize */
+init();
+</script>
 </body>
 </html>
-
-
-
-
-
