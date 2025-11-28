@@ -324,7 +324,7 @@
 </head>
 <body>
     <div class="container" id="mainForm">
-        <h1>TA Preferences Form</h1>
+        <h1>TA Preference Form</h1>
         <p class="subtitle">Select your preferred TAs for courses, labs, and facilities.</p>
 
         <div class="section">
@@ -383,7 +383,7 @@
 
     <script>
         // Configuration - Replace with your actual data
-        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxDCCx7DSn4JgSUDi77PshEfM4wytS2LkCTnNmwqzyRxNEuMHa5bgEqqvWVi3MffOuE/exec';
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxBQ4S51KHNKl1w3o86q5ccTZCyGkYp8M9tauoPslAi03iqwqd3GUNLACTl1-p1Q8-N/exec';
         
         const availableTAs = [
                 "EP21B043 - Yash Kashtikar",
@@ -907,54 +907,52 @@
 
         function submitForm() {
             hideConfirmation();
-            // Optional: Show a loading indicator here
-
-            const name = document.getElementById('submitterName').value;
-            const email = document.getElementById('submitterEmail').value;
-            
+        
+            const name = document.getElementById('submitterName').value.trim();
+            const email = document.getElementById('submitterEmail').value.trim();
+        
             const payload = {
-                submitterName: name,
-                submitterEmail: email,
+                name: name,
+                email: email,
                 courses: formData.courses.map(c => ({
-                    name: c.name,
-                    numTAsRequired: c.numTAsRequired,
-                    selectedTAs: c.selectedTAs.join('; '),
-                    additionalInfo: c.additionalInfo
+                    item: c.name,
+                    numTAs: c.numTAsRequired,
+                    selectedTAs: c.selectedTAs.join(", "),
+                    info: c.additionalInfo
                 })),
                 labs: formData.labs.map(l => ({
-                    name: l.name,
-                    numTAsRequired: l.numTAsRequired,
-                    selectedTAs: l.selectedTAs.join('; '),
-                    additionalInfo: l.additionalInfo
+                    item: l.name,
+                    numTAs: l.numTAsRequired,
+                    selectedTAs: l.selectedTAs.join(", "),
+                    info: l.additionalInfo
                 })),
                 facilities: formData.facilities.map(f => ({
-                    name: f.name,
-                    numTAsRequired: f.numTAsRequired,
-                    selectedTAs: f.selectedTAs.join('; '),
-                    additionalInfo: f.additionalInfo
+                    item: f.name,
+                    numTAs: f.numTAsRequired,
+                    selectedTAs: f.selectedTAs.join(", "),
+                    info: f.additionalInfo
                 }))
             };
-
-            // Assuming GOOGLE_SCRIPT_URL is configured for a Google Apps Script Web App
+        
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Required for Google Apps Script endpoint
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
-            .then(() => {
-                // Since 'no-cors' is used, we assume success here.
-                document.getElementById('successModal').classList.add('active');
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    document.getElementById('successModal').classList.add('active');
+                } else {
+                    alert("Error submitting form.");
+                }
             })
-            .catch(error => {
-                console.error('Error submitting form:', error);
-                // Fallback for error handling, or better, use a server-side CORS proxy
-                document.getElementById('successModal').classList.add('active'); // Still show success for no-cors due to fetch limitations
+            .catch(err => {
+                console.error(err);
+                alert("Submission failed.");
             });
         }
-
+        
         function downloadData() {
             const data = JSON.stringify({
                 submitterName: document.getElementById('submitterName').value,
@@ -1010,6 +1008,7 @@
     </script>
 </body>
 </html>
+
 
 
 
