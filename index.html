@@ -623,449 +623,148 @@
             "XRD (Rigaku)",
             "XRD (table-top)",
             "PPMS",
-            "DCF"
+            "DCF",
+            "FemtoScience Facility",
+            "Squid Magnetometer"
         ];
 
-        let formData = {
-            courses: [],
-            labs: [],
-            facilities: []
-        };
+        function addItem(type) {
+        const container = document.getElementById(type + "Container");
 
-        let itemCounters = {
-            courses: 0,
-            labs: 0,
-            facilities: 0
-        };
+        const div = document.createElement("div");
+        div.className = "item-card";
 
-        const categoryMap = {
-            'courses': 'Course',
-            'labs': 'Lab',
-            'facilities': 'Facility'
-        };
-
-        function init() {
-            addItem('courses');
-            addItem('labs');
-            addItem('facilities');
-        }
-
-        function addItem(category) {
-            const id = itemCounters[category]++;
-            formData[category].push({
-                id: id,
-                name: '',
-                numTAsRequired: '',
-                selectedTAs: [],
-                additionalInfo: ''
-            });
-
-            const container = document.getElementById(category + 'Container');
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'item-card';
-            itemDiv.id = `${category}-${id}`;
-
-            const categoryMap = {
-                'courses': 'Course',
-                'labs': 'Lab',
-                'facilities': 'Facility'
-            };
-            const categoryLabel = categoryMap[category];
-            
-            itemDiv.innerHTML = `
-                <div class="item-fields">
-                    <div>
-                        <label>Select ${categoryLabel}</label>
-                        <select id="${category}-name-${id}" onchange="updateItemName('${category}', ${id}, this.value)">
-                            <option value="">Select ${categoryLabel}</option>
-                        </select>
-                    </div>
-                    <div class="grid-2">
-                        <div>
-                            <label>Number of TAs Required</label>
-                            <input type="number" min="0" placeholder="e.g., 2" 
-                                   id="${category}-num-${id}" 
-                                   onchange="updateNumTAs('${category}', ${id}, this.value)">
-                        </div>
-                        <div>
-                            <label>Or Select Specific TAs</label>
-                            <div class="multiselect-container">
-                                <button type="button" class="multiselect-button" onclick="toggleDropdown('${category}', ${id})">
-                                    <span id="${category}-ta-label-${id}">Select specific TAs (optional)</span>
-                                    <span>▼</span>
-                                </button>
-                                <div class="multiselect-dropdown" id="${category}-ta-dropdown-${id}">
-                                    ${availableTAs.map(ta => `
-                                        <div class="multiselect-option">
-                                            <input type="checkbox" id="${category}-ta-${id}-${ta.replace(/\s+/g, '-')}" 
-                                                   onchange="toggleTA('${category}', ${id}, '${ta}')">
-                                            <label for="${category}-ta-${id}-${ta.replace(/\s+/g, '-')}">${ta}</label>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <label>Additional Information (Optional)</label>
-                        <textarea id="${category}-info-${id}" 
-                                  placeholder="Any additional notes or requirements..." 
-                                  oninput="updateAdditionalInfo('${category}', ${id}, this.value)"
-                                  style="width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.875rem; resize: vertical; min-height: 60px; font-family: inherit;"></textarea>
+        div.innerHTML = `
+            <div class="item-fields">
+                <input type="text" class="item-name" placeholder="Name of ${type.slice(0, -1)}">
+                <div class="multiselect-container">
+                    <button class="multiselect-button" onclick="toggleDropdown(this)">Select TAs ▾</button>
+                    <div class="multiselect-dropdown">
+                        ${availableTAs
+                            .map(
+                                ta =>
+                                    `<div class="multiselect-option"><input type="checkbox" value="${ta}">${ta}</div>`
+                            )
+                            .join("")}
                     </div>
                 </div>
-                <button class="btn-danger" onclick="removeItem('${category}', ${id})">Remove</button>
-            `;
+                <input type="text" class="item-extra" placeholder="Additional information (optional)">
+            </div>
+            <button class="btn-danger" onclick="this.parentElement.remove()">Remove</button>
+        `;
 
-            container.appendChild(itemDiv);
-            updateDropdownOptions(category);
-        }
+        container.appendChild(div);
+    }
 
-        function removeItem(category, id) {
-            const index = formData[category].findIndex(item => item.id === id);
-            if (index > -1) {
-                formData[category].splice(index, 1);
-            }
-            
-            const element = document.getElementById(`${category}-${id}`);
-            if (element) {
-                element.remove();
-            }
+    function toggleDropdown(button) {
+        const dropdown = button.nextElementSibling;
+        dropdown.classList.toggle("active");
+    }
 
-            updateDropdownOptions(category);
-        }
+    // ===========================================================
+    // ✅ Main Fix: Allow submission if ANY field anywhere is filled
+    // ===========================================================
+    function isFormFilled() {
+        const name = document.getElementById("submitterName").value.trim();
+        const email = document.getElementById("submitterEmail").value.trim();
 
-        function updateItemName(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.name = value;
-            }
-            updateDropdownOptions(category);
-        }
+        if (name || email) return true;
 
-        function updateNumTAs(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.numTAsRequired = value;
+        const allItemCards = document.querySelectorAll(".item-card");
+
+        for (const card of allItemCards) {
+            const itemName = card.querySelector(".item-name").value.trim();
+            const extra = card.querySelector(".item-extra").value.trim();
+            const checkedTAs = card.querySelectorAll("input[type='checkbox']:checked");
+
+            if (itemName || extra || checkedTAs.length > 0) {
+                return true;
             }
         }
 
-        function updateAdditionalInfo(category, id, value) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                item.additionalInfo = value;
-            }
+        return false;
+    }
+
+    // ===========================================================
+    // Show Confirmation Modal
+    // ===========================================================
+    function showConfirmation() {
+        if (!isFormFilled()) {
+            alert("Please fill at least one field (Name / Email / any Course / Lab / Facility).");
+            return;
         }
 
-        function toggleTA(category, id, ta) {
-            const item = formData[category].find(item => item.id === id);
-            if (item) {
-                const index = item.selectedTAs.indexOf(ta);
-                if (index > -1) {
-                    item.selectedTAs.splice(index, 1);
-                } else {
-                    item.selectedTAs.push(ta);
-                }
-                updateTALabel(category, id);
-            }
+        const modal = document.getElementById("confirmationModal");
+        const out = document.getElementById("confirmationContent");
+        out.innerHTML = "";
+
+        function appendSection(title, items, cssClass) {
+            if (items.length === 0) return;
+
+            const section = document.createElement("div");
+            section.className = "confirmation-item";
+            section.innerHTML = `<h4>${title}</h4>`;
+
+            items.forEach(obj => {
+                const div = document.createElement("div");
+                div.className = `confirmation-detail ${cssClass}`;
+                div.innerHTML = `
+                    <p class="name">${obj.name}</p>
+                    <p>TAs: ${obj.tas.join(", ") || "None"}</p>
+                    <p>Info: ${obj.extra || "—"}</p>
+                `;
+                section.appendChild(div);
+            });
+
+            out.appendChild(section);
         }
 
-        function updateTALabel(category, id) {
-            const item = formData[category].find(item => item.id === id);
-            const label = document.getElementById(`${category}-ta-label-${id}`);
-            if (item && label) {
-                if (item.selectedTAs.length === 0) {
-                    label.textContent = 'Select specific TAs (optional)';
-                } else {
-                    label.textContent = `${item.selectedTAs.length} TA${item.selectedTAs.length > 1 ? 's' : ''} selected`;
-                }
-            }
-        }
+        const sections = [
+            { container: "coursesContainer", title: "Courses", class: "" },
+            { container: "labsContainer", title: "Labs", class: "lab" },
+            { container: "facilitiesContainer", title: "Facilities", class: "facility" }
+        ];
 
-        function toggleDropdown(category, id) {
-            const dropdown = document.getElementById(`${category}-ta-dropdown-${id}`);
-            dropdown.classList.toggle('active');
-            
-            // Close other dropdowns
-            document.querySelectorAll('.multiselect-dropdown').forEach(dd => {
-                if (dd.id !== `${category}-ta-dropdown-${id}`) {
-                    dd.classList.remove('active');
+        sections.forEach(s => {
+            const items = [];
+            document.querySelectorAll(`#${s.container} .item-card`).forEach(card => {
+                const name = card.querySelector(".item-name").value.trim();
+                const tas = [...card.querySelectorAll("input[type='checkbox']:checked")].map(
+                    c => c.value
+                );
+                const extra = card.querySelector(".item-extra").value.trim();
+
+                if (name || tas.length > 0 || extra) {
+                    items.push({ name, tas, extra });
                 }
             });
-        }
 
-        function updateDropdownOptions(category) {
-            const selectedNames = formData[category]
-                .map(item => item.name)
-                .filter(name => name !== '');
-
-            let availableOptions;
-            if (category === 'courses') availableOptions = availableCourses;
-            else if (category === 'labs') availableOptions = availableLabs;
-            else availableOptions = availableFacilities;
-
-            formData[category].forEach(item => {
-                const select = document.getElementById(`${category}-name-${item.id}`);
-                if (select) {
-                    const currentValue = select.value;
-                    const categoryMap = {
-                        'courses': 'Course',
-                        'labs': 'Lab',
-                        'facilities': 'Facility'
-                    };
-                    select.innerHTML = `<option value="">Select ${categoryMap[category]}</option>`;
-                    
-                    availableOptions.forEach(option => {
-                        if (!selectedNames.includes(option) || option === currentValue) {
-                            const opt = document.createElement('option');
-                            opt.value = option;
-                            opt.textContent = option;
-                            if (option === currentValue) {
-                                opt.selected = true;
-                            }
-                            select.appendChild(opt);
-                        }
-                    });
-                }
-            });
-        }
-
-        function showConfirmation() {
-            const name = document.getElementById('submitterName').value;
-            const email = document.getElementById('submitterEmail').value;
-
-            if (!name || !email) {
-                alert('Please fill in your name and email');
-                return;
-            }
-
-            const content = document.getElementById('confirmationContent');
-            let html = `
-                <div class="confirmation-item">
-                    <h4>Submitter Information</h4>
-                    <p>Name: ${name}</p>
-                    <p>Email: ${email}</p>
-                </div>
-            `;
-
-            const courses = formData.courses.filter(c => c.name);
-            if (courses.length > 0) {
-                html += '<div class="confirmation-item"><h4>Courses</h4>';
-                courses.forEach(course => {
-                    const additionalInfoDisplay = course.additionalInfo ? 
-                        course.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail">
-                            <p class="name">${course.name}</p>
-                            <p>Number of TAs: ${course.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-
-            const labs = formData.labs.filter(l => l.name);
-            if (labs.length > 0) {
-                html += '<div class="confirmation-item"><h4>Labs</h4>';
-                labs.forEach(lab => {
-                    const additionalInfoDisplay = lab.additionalInfo ? 
-                        lab.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail lab">
-                            <p class="name">${lab.name}</p>
-                            <p>Number of TAs: ${lab.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-
-            const facilities = formData.facilities.filter(f => f.name);
-            if (facilities.length > 0) {
-                html += '<div class="confirmation-item"><h4>Facilities</h4>';
-                facilities.forEach(facility => {
-                    const additionalInfoDisplay = facility.additionalInfo ? 
-                        facility.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail facility">
-                            <p class="name">${facility.name}</p>
-                            <p>Number of TAs: ${facility.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-
-            content.innerHTML = html;
-            document.getElementById('confirmationModal').classList.add('active');
-        }
-
-        function hideConfirmation() {
-            document.getElementById('confirmationModal').classList.remove('active');
-        }
-
-        let isSubmitting = false;
-
-        async function submitForm() {
-            // Prevent multiple submissions
-            if (isSubmitting) {
-                return;
-            }
-            
-            isSubmitting = true;
-            const submitBtn = document.querySelector('#confirmationModal .btn-primary');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Submitting...';
-            submitBtn.disabled = true;
-
-            const timestamp = new Date().toISOString();
-            const name = document.getElementById('submitterName').value;
-            const email = document.getElementById('submitterEmail').value;
-
-            // Show success immediately for better UX
-            hideConfirmation();
-            document.getElementById('successModal').classList.add('active');
-
-            try {
-                // Submit courses
-                for (const course of formData.courses.filter(c => c.name)) {
-                    fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sheet: 'Courses',
-                            data: {
-                                timestamp,
-                                submitterName: name,
-                                submitterEmail: email,
-                                courseName: course.name,
-                                numTAsRequired: course.numTAsRequired || 'Not specified',
-                                selectedTAs: course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None specified',
-                                additionalInfo: course.additionalInfo || ''
-                            }
-                        })
-                    }).catch(err => console.error('Course submission error:', err));
-                }
-
-                // Submit labs
-                for (const lab of formData.labs.filter(l => l.name)) {
-                    fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sheet: 'Labs',
-                            data: {
-                                timestamp,
-                                submitterName: name,
-                                submitterEmail: email,
-                                labName: lab.name,
-                                numTAsRequired: lab.numTAsRequired || 'Not specified',
-                                selectedTAs: lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None specified',
-                                additionalInfo: lab.additionalInfo || ''
-                            }
-                        })
-                    }).catch(err => console.error('Lab submission error:', err));
-                }
-
-                // Submit facilities
-                for (const facility of formData.facilities.filter(f => f.name)) {
-                    fetch(GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sheet: 'Facilities',
-                            data: {
-                                timestamp,
-                                submitterName: name,
-                                submitterEmail: email,
-                                facilityName: facility.name,
-                                numTAsRequired: facility.numTAsRequired || 'Not specified',
-                                selectedTAs: facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None specified',
-                                additionalInfo: facility.additionalInfo || ''
-                            }
-                        })
-                    }).catch(err => console.error('Facility submission error:', err));
-                }
-            } catch (error) {
-                console.error('Submission error:', error);
-            } finally {
-                // Reset button state
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                isSubmitting = false;
-            }
-        }
-
-        function downloadData() {
-            const name = document.getElementById('submitterName').value;
-            const email = document.getElementById('submitterEmail').value;
-
-            const data = {
-                submitterInfo: {
-                    name: name,
-                    email: email,
-                    timestamp: new Date().toLocaleString()
-                },
-                courses: formData.courses.filter(c => c.name),
-                labs: formData.labs.filter(l => l.name),
-                facilities: formData.facilities.filter(f => f.name)
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ta-preferences-${Date.now()}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function resetForm() {
-            document.getElementById('successModal').classList.remove('active');
-            document.getElementById('submitterName').value = '';
-            document.getElementById('submitterEmail').value = '';
-            
-            formData = {
-                courses: [],
-                labs: [],
-                facilities: []
-            };
-
-            itemCounters = {
-                courses: 0,
-                labs: 0,
-                facilities: 0
-            };
-
-            document.getElementById('coursesContainer').innerHTML = '';
-            document.getElementById('labsContainer').innerHTML = '';
-            document.getElementById('facilitiesContainer').innerHTML = '';
-
-            init();
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.multiselect-container')) {
-                document.querySelectorAll('.multiselect-dropdown').forEach(dd => {
-                    dd.classList.remove('active');
-                });
-            }
+            appendSection(s.title, items, s.class);
         });
 
-        // Initialize form on load
-        window.onload = init;
-    </script>
+        modal.classList.add("active");
+    }
+
+    // ===========================================================
+    function hideConfirmation() {
+        document.getElementById("confirmationModal").classList.remove("active");
+    }
+
+    function submitForm() {
+        hideConfirmation();
+        document.getElementById("successModal").classList.add("active");
+    }
+
+    function resetForm() {
+        location.reload();
+    }
+
+    function downloadData() {
+        alert("Download triggered (implement CSV if needed)");
+    }
+</script>
 </body>
 
 </html>
+
 
