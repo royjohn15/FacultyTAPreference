@@ -74,7 +74,7 @@
 
 <script>
 /* ---------- Configuration ---------- */
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbv_zlV3jSVWcoLaUSW4ppZnj5Rav4ses-kqD3FVkLQhJzG_HfLKhHhoV74ppHGtZK/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSSVOKh1sfEj0FhuflozwGBEMl3vHbbmoEURIdlMo4Z-Fifl8eW3fCqn_tbZK-byJh/exec';
 
 /* ---------- Static lists ---------- */
 const availableTAs = [
@@ -571,30 +571,23 @@ function submitForm() {
   submitBtn.disabled = true;
 
   fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(response => {
-    // attempt to parse JSON response
-    return response.json().catch(() => ({ status: 'unknown', raw: null }));
-  })
-  .then(data => {
-    submitBtn.disabled = false;
-    if (data && data.status === 'success') {
-      document.getElementById('successModal').classList.add('active');
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(data => {
+    if (data.status === "success") {
+        document.getElementById("successModal").classList.add("active");
     } else {
-      console.error('Apps Script response:', data);
-      alert('Submission received but server returned an unexpected response. Check logs.');
-      document.getElementById('successModal').classList.add('active'); // still show success
+        alert("Error submitting form.");
     }
-  })
-  .catch(err => {
-    submitBtn.disabled = false;
-    console.error('Network/submit error:', err);
-    alert('Submission failed due to network or CORS. Ensure web app is deployed as "Anyone, even anonymous" and try again.');
-  });
-}
+})
+.catch(err => {
+    alert("Network error or CORS blocked.");
+    console.error(err);
+});
+
 
 /* ---------- Utilities: download, reset, helpers ---------- */
 function downloadData() {
@@ -652,4 +645,5 @@ init();
 </script>
 </body>
 </html>
+
 
