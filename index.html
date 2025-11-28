@@ -821,105 +821,85 @@
             });
         }
 
-        // --- START OF CORRECTION ---
+        // --- UPDATED LOGIC START ---
 
-        // Function to check if an individual item (course, lab, facility) has any data
+        // Function to check if an individual item has ANY data (Dropdown, Number, TAs, OR Additional Info)
         function isItemFilled(item) {
-            return item.name.trim() !== '' || 
-                   item.numTAsRequired !== '' || 
-                   item.selectedTAs.length > 0 || 
-                   item.additionalInfo.trim() !== '';
+            return (item.name && item.name.trim() !== '') || 
+                   (item.numTAsRequired && item.numTAsRequired !== '') || 
+                   (item.selectedTAs && item.selectedTAs.length > 0) || 
+                   (item.additionalInfo && item.additionalInfo.trim() !== '');
         }
 
         function showConfirmation() {
+            // 1. Get User Details
             const name = document.getElementById('submitterName').value.trim();
             const email = document.getElementById('submitterEmail').value.trim();
 
+            // 2. MANDATORY CHECK: Name and Email must be filled
+            if (name === '' || email === '') {
+                alert('Please fill in your Name and Email before submitting.');
+                return;
+            }
+
+            // 3. Filter data to find items that have ANY content (including just Additional Info)
             const courses = formData.courses.filter(isItemFilled);
             const labs = formData.labs.filter(isItemFilled);
             const facilities = formData.facilities.filter(isItemFilled);
 
-            // NEW VALIDATION LOGIC: Check if at least one basic field is filled OR any item has data
-            if (name === '' && email === '' && courses.length === 0 && labs.length === 0 && facilities.length === 0) {
-                alert('Please fill in your name and email, or select/fill details for at least one course, lab, or facility.');
+            // 4. DATA CHECK: At least one item (Course, Lab, or Facility) must be filled
+            if (courses.length === 0 && labs.length === 0 && facilities.length === 0) {
+                alert('Please provide details for at least one Course, Lab, or Facility.\n\nYou can select a name from the list OR simply provide "Additional Information".');
                 return;
             }
 
-            // Filter out items that are completely empty before generating confirmation content
+            // Update global formData with the filtered lists (to ensure clean submission)
             formData.courses = courses;
             formData.labs = labs;
             formData.facilities = facilities;
-
 
             const content = document.getElementById('confirmationContent');
             let html = `
                 <div class="confirmation-item">
                     <h4>Submitter Information</h4>
-                    <p>Name: ${name || 'Not provided'}</p>
-                    <p>Email: ${email || 'Not provided'}</p>
+                    <p>Name: ${name}</p>
+                    <p>Email: ${email}</p>
                 </div>
             `;
             
-            if (courses.length > 0) {
-                html += '<div class="confirmation-item"><h4>Courses</h4>';
-                courses.forEach(course => {
-                    const additionalInfoDisplay = course.additionalInfo ? 
-                        course.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail">
-                            <p class="name">${course.name || 'No Course Selected'}</p>
-                            <p>Number of TAs: ${course.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${course.selectedTAs.length > 0 ? course.selectedTAs.join(', ') : 'None selected'}</p>
+            // Helper function to render items
+            const renderItems = (items, typeName, className) => {
+                if (items.length === 0) return '';
+                let sectionHtml = `<div class="confirmation-item"><h4>${typeName}</h4>`;
+                items.forEach(item => {
+                    const additionalInfoDisplay = item.additionalInfo ? 
+                        item.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
+                    
+                    // Display 'Custom Entry' if they didn't select a dropdown name but filled other info
+                    const displayName = item.name || '<span style="color:#6b7280; font-style:italic;">(Custom / No Dropdown Selected)</span>';
+
+                    sectionHtml += `
+                        <div class="confirmation-detail ${className}">
+                            <p class="name">${displayName}</p>
+                            <p>Number of TAs: ${item.numTAsRequired || 'Not specified'}</p>
+                            <p>Specific TAs: ${item.selectedTAs.length > 0 ? item.selectedTAs.join(', ') : 'None selected'}</p>
                             ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
                         </div>
                     `;                
                 });
-                html += '</div>';
-            }
+                sectionHtml += '</div>';
+                return sectionHtml;
+            };
 
-            if (labs.length > 0) {
-                html += '<div class="confirmation-item"><h4>Labs</h4>';
-                labs.forEach(lab => {
-                    const additionalInfoDisplay = lab.additionalInfo ? 
-                        lab.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail lab">
-                            <p class="name">${lab.name || 'No Lab Selected'}</p>
-                            <p>Number of TAs: ${lab.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${lab.selectedTAs.length > 0 ? lab.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;                
-                });
-                html += '</div>';
-            }
-
-            if (facilities.length > 0) {
-                html += '<div class="confirmation-item"><h4>Facilities</h4>';
-                facilities.forEach(facility => {
-                    const additionalInfoDisplay = facility.additionalInfo ? 
-                        facility.additionalInfo.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
-                    html += `
-                        <div class="confirmation-detail facility">
-                            <p class="name">${facility.name || 'No Facility Selected'}</p>
-                            <p>Number of TAs: ${facility.numTAsRequired || 'Not specified'}</p>
-                            <p>Specific TAs: ${facility.selectedTAs.length > 0 ? facility.selectedTAs.join(', ') : 'None selected'}</p>
-                            ${additionalInfoDisplay ? `<p>Additional Information: ${additionalInfoDisplay}</p>` : ''}
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-
-            if (courses.length === 0 && labs.length === 0 && facilities.length === 0) {
-                html += '<p>No specific course, lab, or facility preferences were entered.</p>';
-            }
+            html += renderItems(courses, 'Courses', '');
+            html += renderItems(labs, 'Labs', 'lab');
+            html += renderItems(facilities, 'Facilities', 'facility');
 
             content.innerHTML = html;
             document.getElementById('confirmationModal').classList.add('active');
         }
 
-        // --- END OF CORRECTION ---
+        // --- UPDATED LOGIC END ---
 
         function hideConfirmation() {
             document.getElementById('confirmationModal').classList.remove('active');
@@ -1030,4 +1010,3 @@
     </script>
 </body>
 </html>
-
